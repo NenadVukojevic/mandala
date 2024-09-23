@@ -1,0 +1,78 @@
+<html>
+<style>
+  body,
+  html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: black;
+  }
+
+  canvas {
+    display: block;
+  }
+</style>
+
+<body>
+  <canvas id="myCanvas" width="1200" height="1200"></canvas>
+  <script>
+    const canvas = document.getElementById('myCanvas');
+const ctx = canvas.getContext('2d');
+
+// Function to draw arcs one by one with a red dot at the center of the current arc
+function drawArcs(arcs, speed = 0.02) {
+  let currentArcIndex = 0;
+
+  function drawNextArc() {
+    const arc = arcs[currentArcIndex];
+    arc.currentAngle = arc.startAngle; // Initialize current angle for the arc
+
+    function drawArcFrame() {
+      // Draw the arc point by point until it reaches the end angle
+      if (arc.currentAngle <= arc.endAngle) {
+        ctx.beginPath();
+        ctx.arc(arc.x, arc.y, arc.radius, arc.startAngle, arc.currentAngle);
+        ctx.strokeStyle = arc.color || 'black';
+        ctx.lineWidth = arc.lineWidth || 2;
+        ctx.stroke();
+
+        // Draw a red dot at the midpoint
+        ctx.beginPath();
+        ctx.arc(arc.x, arc.y, 2, 0, 2 * Math.PI); // Red dot radius = 5
+        ctx.fillStyle = 'red';
+        ctx.fill();
+
+        arc.currentAngle += speed; // Increment the angle for the next frame
+        requestAnimationFrame(drawArcFrame); // Keep drawing this arc
+      } else {
+        // Clear the red dot when the arc is fully drawn
+        currentArcIndex++;
+        if (currentArcIndex < arcs.length) {
+          drawNextArc(); // Start drawing the next arc
+        }
+      }
+    }
+
+    // Start drawing the current arc
+    drawArcFrame();
+  }
+
+  // Start drawing the first arc
+  drawNextArc();
+}
+
+// Example arcs array with initial arc
+const arcs = [
+  { x: 493, y: 352, radius: 200, startAngle: (2.01 / 3) * Math.PI, endAngle: (2.26 / 3) * Math.PI, color: 'white' },
+  // Additional arcs can be added here for further drawing
+  { x: 493, y: 352, radius: 200, startAngle: (2.26 / 3) * Math.PI, endAngle: (2.51 / 3) * Math.PI, color: 'blue' },
+  { x: 493, y: 352, radius: 200, startAngle: (2.51 / 3) * Math.PI, endAngle: (2.76 / 3) * Math.PI, color: 'green' }
+];
+
+// Call the function to start drawing the arcs with a red dot at the midpoint of each one
+drawArcs(arcs, 0.05);
+
+  </script>
+</body>
+
+</html>
