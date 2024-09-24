@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Star Animation</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: black;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="starCanvas"></canvas>
+
+<script>
+  const canvas = document.getElementById('starCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Resize the canvas to fit the window
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  // Array to store active stars
+  let stars = [];
+
+  // Vantage point at the center of the screen
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+
+  // Star constructor function
+  function Star() {
+    // All stars start from the center (vantage point)
+    this.x = centerX;
+    this.y = centerY;
+    
+    // Random velocity components to move in different directions
+    const speed = Math.random() * 3 + 1; // Speed magnitude
+    const angle = Math.random() * Math.PI * 2; // Random angle (in radians)
+
+    this.vx = Math.cos(angle) * speed;
+    this.vy = Math.sin(angle) * speed;
+    
+    // Initial size and the final size limit (not larger than 10px)
+    this.size = Math.random() * 2 + 1;  // Initial size between 1px and 3px
+    this.maxSize = 10;
+
+    // Growth rate (how fast the star grows)
+    this.growthRate = Math.random() * 0.2 + 0.05;
+
+    // Draw the star (as a circle)
+    this.draw = function() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = 'white';
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    // Update the star's position and size
+    this.update = function() {
+      this.x += this.vx;
+      this.y += this.vy;
+
+      // Increase size but don't let it exceed maxSize
+      if (this.size < this.maxSize) {
+        this.size += this.growthRate;
+      }
+
+      // Draw the updated star
+      this.draw();
+    }
+  }
+
+  // Function to generate a new star at random intervals
+  function generateStar() {
+    stars.push(new Star());
+
+    // Generate stars at random intervals (between 300ms and 1000ms)
+    const nextInterval = Math.random() * 700 + 300;
+    setTimeout(generateStar, nextInterval);
+  }
+
+  // Animation loop
+  function animate() {
+    // Clear the canvas for the next frame
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Update and draw each star
+    stars.forEach(star => star.update());
+
+    // Loop the animation
+    requestAnimationFrame(animate);
+  }
+
+  // Start generating stars
+  generateStar();
+
+  // Start the animation loop
+  animate();
+
+  // Handle window resizing
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    // Update the center point when window is resized
+    centerX = canvas.width / 2;
+    centerY = canvas.height / 2;
+  });
+</script>
+
+</body>
+</html>
