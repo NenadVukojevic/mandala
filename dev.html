@@ -1,0 +1,44 @@
+<html>
+<style>
+    body,
+    html {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: black;
+    }
+
+    canvas {
+        display: block;
+    }
+</style>
+
+<body>
+    <canvas id="myCanvas" width="1200" height="1200"></canvas>
+    <script src="./patterns/latice.js"></script>
+    <script>
+
+        const canvas = document.getElementById('myCanvas');
+        const context = canvas.getContext('2d');
+
+        function drawFast(elements) {
+            elements.forEach(el => {
+                context.beginPath();
+                context.moveTo(el.sX, el.sY); // Start point
+
+                // First curve
+                context.bezierCurveTo(el.cp1X, el.cp1Y, el.cp2X, el.cp2Y, el.eX, el.eY);
+                context.strokeStyle = 'white';
+                context.lineWidth = 2;
+
+                context.stroke();
+
+            })
+        };
+
+        drawFast(elements);
+
+    </script>
+</body>
+
+</html>
