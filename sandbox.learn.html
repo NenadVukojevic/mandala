@@ -1,0 +1,62 @@
+<html>
+<style>
+    body,
+    html {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: white;
+    }
+
+    canvas {
+        display: block;
+    }
+</style>
+
+<body>
+    <canvas id="myCanvas" width="1200" height="1200"></canvas>
+    <script src="./patterns/eightpoints.js"></script>
+    <script>
+
+        const canvas = document.getElementById('myCanvas');
+        const context = canvas.getContext('2d');
+/*
+        // Quadratic Bezier Curve
+        context.beginPath();
+        context.moveTo(50, 100);
+        context.quadraticCurveTo(350, 550, 250, 100); // Control point (150, 50)
+        context.stroke();
+
+        // Cubic Bezier Curve
+        context.beginPath();
+        context.moveTo(50, 200);
+        context.bezierCurveTo(150, 350, 200, 150, 300, 200); // Two control points
+        context.stroke();
+
+        context.beginPath();
+        context.arc(150, 350, 2, 0, 2 * Math.PI); // Red dot radius = 5
+        context.fillStyle = 'red';
+        context.fill();
+*/
+        context.beginPath();
+        context.arc(150, 200, 2, 0, 2 * Math.PI); // Red dot radius = 5
+        context.fillStyle = 'red';
+        context.fill();
+
+        context.beginPath();
+        context.arc(400, 200, 2, 0, 2 * Math.PI); // Red dot radius = 5
+        context.fillStyle = 'red';
+        context.fill();
+
+
+        context.beginPath();
+        context.moveTo(250, 400); // Start point
+
+        // First curve
+        context.bezierCurveTo(150, 200, 400, 200, 300, 400);
+
+        context.stroke();
+    </script>
+</body>
+
+</html>

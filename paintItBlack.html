@@ -1,0 +1,176 @@
+<html>
+<style>
+    body,
+    html {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: black;
+    }
+
+    canvas {
+        display: block;
+    }
+</style>
+
+<body>
+    <canvas id="myCanvas" width="1200" height="1200"></canvas>
+    <script src="./patterns/eyes.js"></script>
+    <script>
+
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function drawArcsFast(arcs) {
+            arcs.forEach(arc => {
+                ctx.beginPath();
+                ctx.arc(
+                    arc.x,                 // x-coordinate of the center
+                    arc.y,                 // y-coordinate of the center
+                    arc.radius,                 // radius of the arc
+                    arc.startAngle,             // start angle in radians
+                    arc.endAngle
+                );
+                ctx.strokeStyle = arc.color || 'white';
+                ctx.lineWidth = arc.lineWidth || 2;
+                ctx.stroke();
+            });
+        }
+
+
+        let fillIndex = 0;
+        function startFillingAreas() {
+            if (fillIndex < fills.length) {
+                const area = fills[fillIndex];
+
+                // Use floodFill or fillRect to fill the area
+                floodFill(area.x, area.y, area.color);
+
+                fillIndex++;
+
+                // Set a delay before filling the next area
+                setTimeout(startFillingAreas, 500); // 500ms delay between each fill
+            }
+        }
+
+        function fillPattern(fills) {
+            fills.forEach(fill => {
+                floodFill(fill.x, fill.y, [255, 255, 255, 255]);
+                setTimeout(fillPattern, 500);
+            })
+        }
+
+        // Function to draw arcs one by one with a red dot at the center of the current arc
+        function drawArcs(arcs, speed = 0.02) {
+            let currentArcIndex = 0;
+
+            function drawNextArc() {
+                const arc = arcs[currentArcIndex];
+                arc.currentAngle = arc.startAngle; // Initialize current angle for the arc
+
+                function drawArcFrame() {
+                    // Draw the arc point by point until it reaches the end angle
+                    if (arc.currentAngle <= arc.endAngle) {
+                        ctx.beginPath();
+                        ctx.arc(arc.x, arc.y, arc.radius, arc.startAngle, arc.currentAngle);
+                        ctx.strokeStyle = arc.color || 'white';
+                        ctx.lineWidth = arc.lineWidth || 1;
+                        ctx.stroke();
+                        /*
+                                    // Draw a red dot at the midpoint
+                                    ctx.beginPath();
+                                    ctx.arc(arc.x, arc.y, 2, 0, 2 * Math.PI); // Red dot radius = 5
+                                    ctx.fillStyle = 'red';
+                                    ctx.fill();
+                        */
+                        arc.currentAngle += speed; // Increment the angle for the next frame
+                        requestAnimationFrame(drawArcFrame); // Keep drawing this arc
+                    } else {
+                        // Clear the red dot when the arc is fully drawn
+                        currentArcIndex++;
+                        if (currentArcIndex < arcs.length) {
+                            drawNextArc(); // Start drawing the next arc
+                        }
+                        else {
+                            startFillingAreas();
+                        }
+                    }
+                }
+
+                // Start drawing the current arc
+                drawArcFrame();
+            }
+
+            // Start drawing the first arc
+            drawNextArc();
+
+
+        }
+
+        // Paint bucket (flood fill) function
+        function floodFill(x, y, fillColor) {
+            const canvasWidth = canvas.width;
+            const canvasHeight = canvas.height;
+            const imageData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
+            const data = imageData.data;
+
+            // Get the starting color (target color to replace)
+            const startPos = (y * canvasWidth + x) * 4;
+            const startColor = [
+                data[startPos],
+                data[startPos + 1],
+                data[startPos + 2],
+                data[startPos + 3]
+            ];
+
+            // Check if the starting color is already the fill color
+            if (isSameColor(startColor, fillColor)) {
+                return;
+            }
+
+            // Use a stack for flood fill (non-recursive approach to avoid call stack limit)
+            const stack = [[x, y]];
+
+            while (stack.length) {
+                const [currentX, currentY] = stack.pop();
+                const pos = (currentY * canvasWidth + currentX) * 4;
+
+                // If the current pixel is the same as the target color, fill it
+                if (isSameColor([data[pos], data[pos + 1], data[pos + 2], data[pos + 3]], startColor)) {
+                    setColor(data, pos, fillColor);
+
+                    // Add neighboring pixels to the stack (4-way connectivity)
+                    if (currentX > 0) stack.push([currentX - 1, currentY]);
+                    if (currentX < canvasWidth - 1) stack.push([currentX + 1, currentY]);
+                    if (currentY > 0) stack.push([currentX, currentY - 1]);
+                    if (currentY < canvasHeight - 1) stack.push([currentX, currentY + 1]);
+                }
+            }
+
+            // Apply the filled image data back to the canvas
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        // Helper function to set the color at a specific pixel position
+        function setColor(data, pos, color) {
+            data[pos] = color[0];     // Red
+            data[pos + 1] = color[1]; // Green
+            data[pos + 2] = color[2]; // Blue
+            data[pos + 3] = color[3]; // Alpha
+        }
+
+        // Helper function to compare two colors (RGBA)
+        function isSameColor(color1, color2) {
+            return color1[0] === color2[0] && color1[1] === color2[1] && color1[2] === color2[2] && color1[3] === color2[3];
+        }
+
+
+        // Call the function to start drawing the arcs with a red dot at the midpoint of each one
+        drawArcs(arcs, 0.1);//
+        //drawArcsFast(arcs);////
+        //fillPattern(fills);//
+
+    </script>
+</body>
+
+</html>

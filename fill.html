@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arc Drawing and Area Fill</title>
+</head>
+<body>
+<canvas id="canvas" width="400" height="400" style="border:1px solid black"></canvas>
+
+<script>
+// Initialize canvas and context
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+// List of arcs (startX, startY, radius, startAngle, endAngle, color)
+const arcs = [
+  { x: 200, y: 200, radius: 100, startAngle: 0, endAngle: Math.PI / 2, color: 'black' },
+  { x: 200, y: 200, radius: 100, startAngle: Math.PI / 2, endAngle: Math.PI, color: 'black' },
+  { x: 200, y: 200, radius: 100, startAngle: Math.PI, endAngle: 1.5 * Math.PI, color: 'black' },
+  { x: 200, y: 200, radius: 100, startAngle: 1.5 * Math.PI, endAngle: 2 * Math.PI, color: 'black' },
+  { x: 150, y: 150, radius: 50, startAngle: 0, endAngle: Math.PI * 2, color: 'black' },
+  // You can add more arcs to this list...
+];
+
+// List of areas to fill (x, y for the point inside the area)
+const fillAreas = [
+  { x: 160, y: 160, color: 'red' },
+  { x: 240, y: 160, color: 'green' },
+  { x: 160, y: 240, color: 'blue' },
+  { x: 240, y: 240, color: 'yellow' },
+];
+
+// Function to draw arcs from the list, one by one
+let arcIndex = 0;
+function drawNextArc() {
+  if (arcIndex < arcs.length) {
+    const arc = arcs[arcIndex];
+    ctx.beginPath();
+    ctx.arc(arc.x, arc.y, arc.radius, arc.startAngle, arc.endAngle);
+    ctx.strokeStyle = arc.color;
+    ctx.stroke();
+    arcIndex++;
+    // Continue drawing the next arc
+    requestAnimationFrame(drawNextArc);
+  } else {
+    // Once all arcs are drawn, start filling areas
+    startFillingAreas();
+  }
+}
+
+// Function to fill areas with a delay between each fill
+let fillIndex = 0;
+function startFillingAreas() {
+  if (fillIndex < fillAreas.length) {
+    const area = fillAreas[fillIndex];
+
+    // Use floodFill or fillRect to fill the area
+    floodFill(area.x, area.y, area.color);
+
+    fillIndex++;
+
+    // Set a delay before filling the next area
+    setTimeout(startFillingAreas, 500); // 500ms delay between each fill
+  }
+}
+
+// Simple flood fill function for now (could be expanded for more complex cases)
+function floodFill(x, y, fillColor) {
+  // Set the fill color
+  ctx.fillStyle = fillColor;
+
+  // Fill a rectangle as a placeholder for the region (you can adjust this for actual regions)
+  ctx.fillRect(x - 10, y - 10, 20, 20); // Fills a small rectangle around the point (x, y)
+}
+
+// Start the arc drawing process
+drawNextArc();
+
+</script>
+</body>
+</html>

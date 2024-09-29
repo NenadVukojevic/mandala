@@ -15,9 +15,28 @@
 
 <body>
   <canvas id="myCanvas" width="1200" height="1200"></canvas>
+  <script src="./patterns/eightpoints.js"></script>
   <script>
+
     const canvas = document.getElementById('myCanvas');
     const ctx = canvas.getContext('2d');
+
+    function drawArcsFast(arcs) {
+      arcs.forEach(arc => {
+        ctx.beginPath();
+        ctx.arc(
+          arc.x,                 // x-coordinate of the center
+          arc.y,                 // y-coordinate of the center
+          arc.radius,                 // radius of the arc
+          arc.startAngle,             // start angle in radians
+          arc.endAngle
+        );
+        ctx.strokeStyle = arc.color || 'white';
+        ctx.lineWidth = arc.lineWidth || 2;
+        ctx.stroke();
+      });
+    }
+
 
     // Function to draw arcs one by one with a red dot at the center of the current arc
     function drawArcs(arcs, speed = 0.02) {
@@ -33,7 +52,7 @@
             ctx.beginPath();
             ctx.arc(arc.x, arc.y, arc.radius, arc.startAngle, arc.currentAngle);
             ctx.strokeStyle = arc.color || 'white';
-            ctx.lineWidth = arc.lineWidth || 2;
+            ctx.lineWidth = arc.lineWidth || 1;
             ctx.stroke();
             /*
                         // Draw a red dot at the midpoint
@@ -65,37 +84,35 @@
       r = (d * Math.PI) / 180
       return r
     }
+
     // Example arcs array with initial arc
-    const arcs = [
-      /* 
-      { x: 400, y: 300, radius: 200, startAngle: deg2rad(0), endAngle: deg2rad(360), color: 'white' },
-         { x: 400, y: 300, radius: 120, startAngle: deg2rad(0), endAngle: deg2rad(360), color: 'blue' },
-         */
-      { x: 545, y: 261, radius: 53, startAngle: deg2rad(115), endAngle: deg2rad(215) },
-      { x: 482, y: 426, radius: 53, startAngle: deg2rad(187), endAngle: deg2rad(287) },
-      { x: 306, y: 417, radius: 53, startAngle: deg2rad(259), endAngle: deg2rad(359) },
-      { x: 260, y: 246, radius: 53, startAngle: deg2rad(331), endAngle: deg2rad(431) },
-      { x: 408, y: 150, radius: 53, startAngle: deg2rad(403), endAngle: deg2rad(503) },
-
-
-      { x: 439, y: 413, radius: 80, startAngle: deg2rad(128), endAngle: deg2rad(183) },
-      { x: 349, y: 409, radius: 80, startAngle: deg2rad(8), endAngle: deg2rad(61) },
-      { x: 304, y: 372, radius: 80, startAngle: deg2rad(200), endAngle: deg2rad(255) },
-      { x: 281, y: 285, radius: 80, startAngle: deg2rad(80), endAngle: deg2rad(133) },
-      { x: 302, y: 231, radius: 80, startAngle: deg2rad(272), endAngle: deg2rad(327) },
-      { x: 377, y: 182, radius: 80, startAngle: deg2rad(152), endAngle: deg2rad(205) },
-      { x: 435, y: 185, radius: 80, startAngle: deg2rad(344), endAngle: deg2rad(399) },
-      { x: 505, y: 242, radius: 80, startAngle: deg2rad(224), endAngle: deg2rad(277) },
-      { x: 520, y: 298, radius: 80, startAngle: deg2rad(416), endAngle: deg2rad(471) },
-      { x: 488, y: 382, radius: 80, startAngle: deg2rad(296), endAngle: deg2rad(349) },
-
-
-
-    ];
-
+    /*  const arcs = [
+  
+        { x: 545, y: 261, radius: 53, startAngle: deg2rad(115), endAngle: deg2rad(215) },
+        { x: 482, y: 426, radius: 53, startAngle: deg2rad(187), endAngle: deg2rad(287) },
+        { x: 306, y: 417, radius: 53, startAngle: deg2rad(259), endAngle: deg2rad(359) },
+        { x: 260, y: 246, radius: 53, startAngle: deg2rad(331), endAngle: deg2rad(431) },
+        { x: 408, y: 150, radius: 53, startAngle: deg2rad(403), endAngle: deg2rad(503) },
+  
+  
+        { x: 439, y: 413, radius: 80, startAngle: deg2rad(128), endAngle: deg2rad(183) },
+        { x: 349, y: 409, radius: 80, startAngle: deg2rad(8), endAngle: deg2rad(61) },
+        { x: 304, y: 372, radius: 80, startAngle: deg2rad(200), endAngle: deg2rad(255) },
+        { x: 281, y: 285, radius: 80, startAngle: deg2rad(80), endAngle: deg2rad(133) },
+        { x: 302, y: 231, radius: 80, startAngle: deg2rad(272), endAngle: deg2rad(327) },
+        { x: 377, y: 182, radius: 80, startAngle: deg2rad(152), endAngle: deg2rad(205) },
+        { x: 435, y: 185, radius: 80, startAngle: deg2rad(344), endAngle: deg2rad(399) },
+        { x: 505, y: 242, radius: 80, startAngle: deg2rad(224), endAngle: deg2rad(277) },
+        { x: 520, y: 298, radius: 80, startAngle: deg2rad(416), endAngle: deg2rad(471) },
+        { x: 488, y: 382, radius: 80, startAngle: deg2rad(296), endAngle: deg2rad(349) },
+  
+  
+  
+      ];
+  */
     // Call the function to start drawing the arcs with a red dot at the midpoint of each one
-    drawArcs(arcs, 0.1);
-
+     drawArcs(arcs, 0.1);//
+   // drawArcsFast(arcs);
   </script>
 </body>
 
