@@ -15,7 +15,7 @@
 
 <body>
     <canvas id="myCanvas" width="1200" height="1200"></canvas>
-    <script src="./patterns/latice.js"></script>
+    <script src="./patterns/mandala.2.js"></script>
     <script>
 
         const canvas = document.getElementById('myCanvas');
@@ -32,8 +32,21 @@
                 context.lineWidth = 2;
 
                 context.stroke();
+/*
+
+                context.beginPath();
+                context.arc(el.cp1X, el.cp1Y, 2, 0, 2 * Math.PI); // Red dot radius = 5
+                context.fillStyle = 'red';
+                context.fill();
+
+                context.beginPath();
+                context.arc(el.cp2X, el.cp2Y, 2, 0, 2 * Math.PI); // Red dot radius = 5
+                context.fillStyle = 'blue';
+                context.fill();*/
+
 
             })
+            setTimeout(drawFast, 100); 
         };
 
         drawFast(elements);

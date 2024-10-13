@@ -40,16 +40,17 @@
 
         let fillIndex = 0;
         function startFillingAreas() {
+            console.log("startFillingAreas", fillIndex);
             if (fillIndex < fills.length) {
                 const area = fills[fillIndex];
 
                 // Use floodFill or fillRect to fill the area
-                floodFill(area.x, area.y, area.color);
+                floodFill(area.x, area.y, [255,255,255,255]);
 
                 fillIndex++;
 
                 // Set a delay before filling the next area
-                setTimeout(startFillingAreas, 500); // 500ms delay between each fill
+                setTimeout(startFillingAreas, 100); // 500ms delay between each fill
             }
         }
 
@@ -167,7 +168,8 @@
 
         // Call the function to start drawing the arcs with a red dot at the midpoint of each one
         drawArcs(arcs, 0.1);//
-        //drawArcsFast(arcs);////
+        //drawArcsFast(arcs);//////
+        //startFillingAreas();
         //fillPattern(fills);//
 
     </script>

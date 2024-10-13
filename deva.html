@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Animation</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="myCanvas" width="1200" height="1200"></canvas>
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Your list of bezier curves and arcs (example)
+        const shapes = [
+
+        { type: 'line', points: [400, 300,  456, 390] },
+{ type: 'line', points: [456, 390,  350, 387] },
+{ type: 'line', points: [350, 387,  300, 480] },
+{ type: 'line', points: [300, 480,  250, 387] },
+{ type: 'line', points: [250, 387,  144, 390] },
+{ type: 'line', points: [144, 390,  200, 300] },
+{ type: 'line', points: [200, 300,  144, 210] },
+{ type: 'line', points: [144, 210,  250, 213] },
+{ type: 'line', points: [250, 213,  300, 120] },
+{ type: 'line', points: [300, 120,  350, 213] },
+{ type: 'line', points: [350, 213,  456, 210] },
+{ type: 'line', points: [456, 210,  400, 300] },
+{ type: 'line', points: [400, 300,  456, 390] },
+{ type: 'line', points: [456, 390,  350, 387] },
+{ type: 'line', points: [350, 387,  300, 480] },
+{ type: 'line', points: [300, 480,  250, 387] },
+{ type: 'line', points: [250, 387,  144, 390] },
+{ type: 'line', points: [144, 390,  200, 300] },
+
+{ type: 'line', points: [378, 345,  375, 430] },
+{ type: 'line', points: [375, 430,  300, 390] },
+{ type: 'line', points: [300, 390,  225, 430] },
+{ type: 'line', points: [225, 430,  222, 345] },
+{ type: 'line', points: [222, 345,  150, 300] },
+{ type: 'line', points: [150, 300,  222, 255] },
+{ type: 'line', points: [222, 255,  225, 170] },
+{ type: 'line', points: [225, 170,  300, 210] },
+{ type: 'line', points: [300, 210,  375, 170] },
+{ type: 'line', points: [375, 170,  378, 255] },
+{ type: 'line', points: [378, 255,  450, 300] },
+{ type: 'line', points: [450, 300,  378, 345] },
+{ type: 'line', points: [378, 345,  375, 430] },
+{ type: 'line', points: [375, 430,  300, 390] },
+{ type: 'line', points: [300, 390,  225, 430] },
+{ type: 'line', points: [225, 430,  222, 345] },
+{ type: 'line', points: [222, 345,  150, 300] },
+{ type: 'line', points: [150, 300,  222, 255] },
+
+
+
+
+
+            { type: 'bezierCurve', points: [475, 343, 478, 367, 454, 359, 459, 384] },
+            { type: 'bezierCurve', points: [459, 384, 436, 394, 456, 408, 435, 419] },
+            { type: 'bezierCurve', points: [435, 419, 426, 442, 409, 424, 402, 448] },
+            { type: 'bezierCurve', points: [402, 448, 377, 446, 388, 468, 364, 468] },
+            { type: 'bezierCurve', points: [364, 468, 345, 484, 339, 460, 322, 479] },
+            { type: 'bezierCurve', points: [322, 479, 300, 465, 300, 490, 278, 479] },
+            { type: 'bezierCurve', points: [278, 479, 255, 484, 261, 460, 236, 468] },
+            { type: 'bezierCurve', points: [236, 468, 223, 446, 212, 468, 198, 448] },
+            { type: 'bezierCurve', points: [198, 448, 174, 442, 191, 424, 165, 419] },
+            { type: 'bezierCurve', points: [165, 419, 164, 394, 144, 408, 141, 384] },
+            { type: 'bezierCurve', points: [141, 384, 122, 367, 146, 359, 125, 343] },
+            { type: 'bezierCurve', points: [125, 343, 136, 320, 111, 323, 120, 300] },
+            { type: 'bezierCurve', points: [120, 300, 111, 277, 136, 280, 125, 257] },
+            { type: 'bezierCurve', points: [125, 257, 146, 241, 122, 233, 141, 216] },
+            { type: 'bezierCurve', points: [141, 216, 144, 192, 164, 206, 165, 181] },
+            { type: 'bezierCurve', points: [165, 181, 191, 176, 174, 158, 198, 152] },
+            { type: 'bezierCurve', points: [198, 152, 212, 132, 223, 154, 236, 132] },
+            { type: 'bezierCurve', points: [236, 132, 261, 140, 255, 116, 278, 121] },
+            { type: 'bezierCurve', points: [278, 121, 300, 110, 300, 135, 322, 121] },
+            { type: 'bezierCurve', points: [322, 121, 339, 140, 345, 116, 364, 132] },
+            { type: 'bezierCurve', points: [364, 132, 388, 132, 377, 154, 402, 152] },
+            { type: 'bezierCurve', points: [402, 152, 409, 176, 426, 158, 435, 181] },
+            { type: 'bezierCurve', points: [435, 181, 456, 192, 436, 206, 459, 216] },
+            { type: 'bezierCurve', points: [459, 216, 454, 241, 478, 233, 475, 257] },
+            { type: 'bezierCurve', points: [475, 257, 489, 277, 464, 280, 480, 300] },
+            { type: 'bezierCurve', points: [480, 300, 464, 320, 489, 323, 475, 343] },
+
+
+            { type: 'bezierCurve', points: [494, 348, 496, 374, 473, 366, 477, 393] },
+            { type: 'bezierCurve', points: [477, 393, 452, 405, 473, 419, 450, 433] },
+            { type: 'bezierCurve', points: [450, 433, 439, 457, 423, 438, 414, 465] },
+            { type: 'bezierCurve', points: [414, 465, 386, 464, 398, 486, 371, 487] },
+            { type: 'bezierCurve', points: [371, 487, 350, 504, 344, 480, 324, 499] },
+            { type: 'bezierCurve', points: [324, 499, 300, 485, 300, 510, 276, 499] },
+            { type: 'bezierCurve', points: [276, 499, 250, 504, 256, 480, 229, 487] },
+            { type: 'bezierCurve', points: [229, 487, 214, 464, 202, 486, 186, 465] },
+            { type: 'bezierCurve', points: [186, 465, 161, 457, 177, 438, 150, 433] },
+            { type: 'bezierCurve', points: [150, 433, 148, 405, 127, 419, 123, 393] },
+            { type: 'bezierCurve', points: [123, 393, 104, 374, 127, 366, 106, 348] },
+            { type: 'bezierCurve', points: [106, 348, 116, 322, 92, 325, 100, 300] },
+            { type: 'bezierCurve', points: [100, 300, 92, 275, 116, 278, 106, 252] },
+            { type: 'bezierCurve', points: [106, 252, 127, 234, 104, 226, 123, 207] },
+            { type: 'bezierCurve', points: [123, 207, 127, 181, 148, 195, 150, 167] },
+            { type: 'bezierCurve', points: [150, 167, 177, 162, 161, 143, 186, 135] },
+            { type: 'bezierCurve', points: [186, 135, 202, 114, 214, 136, 229, 113] },
+            { type: 'bezierCurve', points: [229, 113, 256, 120, 250, 96, 276, 101] },
+            { type: 'bezierCurve', points: [276, 101, 300, 90, 300, 115, 324, 101] },
+            { type: 'bezierCurve', points: [324, 101, 344, 120, 350, 96, 371, 113] },
+            { type: 'bezierCurve', points: [371, 113, 398, 114, 386, 136, 414, 135] },
+            { type: 'bezierCurve', points: [414, 135, 423, 162, 439, 143, 450, 167] },
+            { type: 'bezierCurve', points: [450, 167, 473, 181, 452, 195, 477, 207] },
+            { type: 'bezierCurve', points: [477, 207, 473, 234, 496, 226, 494, 252] },
+            { type: 'bezierCurve', points: [494, 252, 508, 275, 484, 278, 500, 300] },
+            { type: 'bezierCurve', points: [500, 300, 484, 322, 508, 325, 494, 348] },
+
+
+
+
+            /*        { type: 'bezierCurve', points: [50, 150, 80, 80, 150, 150, 200, 200] },  // Example Bezier curve
+                    { type: 'arc', points: [250, 250, 50, 0, Math.PI] },  // Example Arc (half circle)
+                    { type: 'bezierCurve', points: [200, 300, 220, 200, 300, 300, 350, 350] },  // Another Bezier curve
+                    { type: 'arc', points: [100, 100, 30, 0, Math.PI * 2] },  // Full circle
+             */
+        ];
+
+
+        // Function to draw a Line
+        function drawLine(points) {
+            ctx.beginPath();
+            ctx.moveTo(points[0], points[1]);
+            ctx.lineTo(points[2], points[3]);
+            ctx.closePath();
+            ctx.strokeStyle = 'white';
+            ctx.stroke();
+        }
+
+        // Function to draw a Bezier curve
+        function drawBezierCurve(points) {
+            ctx.beginPath();
+            ctx.moveTo(points[0], points[1]);
+            ctx.bezierCurveTo(points[2], points[3], points[4], points[5], points[6], points[7]);
+            ctx.strokeStyle = 'white';
+            ctx.stroke();
+        }
+
+        // Function to draw an Arc
+        function drawArc(points) {
+            ctx.beginPath();
+            ctx.arc(points[0], points[1], points[2], points[3], points[4]);
+            ctx.strokeStyle = 'white';
+            ctx.stroke();
+        }
+
+        // Function to draw the shapes with delay
+        function drawShapesWithDelay(shapes) {
+            shapes.forEach((shape, index) => {
+                setTimeout(() => {
+                    if (shape.type === 'bezierCurve') {
+                        drawBezierCurve(shape.points);
+                    } else if (shape.type === 'arc') {
+                        drawArc(shape.points);
+                    } else if (shape.type === 'line') {
+                        drawLine(shape.points);
+                    }
+                }, index * 100);  // 0.1 second delay between each shape (100 milliseconds)
+            });
+        }
+
+        // Start drawing with delay
+        drawShapesWithDelay(shapes);
+
+    </script>
+</body>
+
+</html>
