@@ -1,0 +1,48 @@
+<html>
+<style>
+    body,
+    html {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: black;
+    }
+
+    canvas {
+        display: block;
+    }
+</style>
+
+<body>
+    <canvas id="myCanvas" width="1200" height="1200"></canvas>
+
+    <script type="module">
+
+        import { generateShapes } from './generators/border_pearl.js';
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const arcs = generateShapes(300, 300, 200, 22);
+
+        function drawArcsFast(arcs) {
+            arcs.forEach(arc => {
+                ctx.beginPath();
+                ctx.arc(
+                    arc.x,                 // x-coordinate of the center
+                    arc.y,                 // y-coordinate of the center
+                    arc.radius,                 // radius of the arc
+                    arc.startAngle,             // start angle in radians
+                    arc.endAngle
+                );
+                ctx.strokeStyle = arc.color || 'white';
+                ctx.lineWidth = arc.lineWidth || 2;
+                ctx.stroke();
+            });
+        }
+
+        drawArcsFast(arcs);
+        console.log(arcs)
+    </script>
+</body>
+
+</html>
