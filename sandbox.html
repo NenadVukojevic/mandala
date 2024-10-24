@@ -22,24 +22,59 @@
     const ctx = canvas.getContext('2d');
 
     function drawArcsFast(arcs) {
-      arcs.forEach(arc => {
-        ctx.beginPath();
-        ctx.arc(
-          arc.x,                 // x-coordinate of the center
-          arc.y,                 // y-coordinate of the center
-          arc.radius,                 // radius of the arc
-          arc.startAngle,             // start angle in radians
-          arc.endAngle
-        );
-        ctx.strokeStyle = arc.color || 'white';
-        ctx.lineWidth = arc.lineWidth || 2;
-        ctx.stroke();
-      });
-    }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            arcs.forEach(arc => {
+                if (arc.type === 'arc') {
+                    drawArcs(arc);
+                }
+                else if (arc.type === 'quad') {
+                    drawQuad(arc);
+                }
+                /*
+                ctx.beginPath();
+                ctx.arc(
+                    arc.x,                 // x-coordinate of the center
+                    arc.y,                 // y-coordinate of the center
+                    arc.radius,                 // radius of the arc
+                    arc.startAngle,             // start angle in radians
+                    arc.endAngle
+                );
+                ctx.strokeStyle = arc.color || 'white';
+                ctx.lineWidth = arc.lineWidth || 2;
+                ctx.stroke();*/
+            });
+        }
+
+        function drawArcs(arc) {
+            ctx.beginPath();
+            ctx.arc(
+                arc.x,                 // x-coordinate of the center
+                arc.y,                 // y-coordinate of the center
+                arc.radius,                 // radius of the arc
+                arc.startAngle,             // start angle in radians
+                arc.endAngle
+            );
+            ctx.strokeStyle = arc.color || 'white';
+            ctx.lineWidth = arc.lineWidth || 2;
+            ctx.stroke();
+        }
+
+        function drawQuad(quad) {
+            ctx.beginPath();
+            ctx.moveTo(quad.a.x, quad.a.y);  // Start at the top quad.
+            ctx.lineTo(quad.b.x, quad.b.y);  // Draw line to the right quad.
+            ctx.lineTo(quad.c.x, quad.c.y);  // Draw line to the bottom quad.
+            ctx.lineTo(quad.d.x, quad.d.y);  // Draw line to the left point
+            ctx.closePath();  // Close the path (back to the top point)
+            ctx.strokeStyle = quad.color || 'white';
+            ctx.lineWidth = quad.lineWidth || 2;
+            ctx.stroke();
+        }
 
 
     // Function to draw arcs one by one with a red dot at the center of the current arc
-    function drawArcs(arcs, speed = 0.02) {
+    function drawArcs1(arcs, speed = 0.02) {
       let currentArcIndex = 0;
 
       function drawNextArc() {

@@ -14,9 +14,13 @@
 </style>
 
 <body>
-    <input type="range" id="sizeRange" min="100" max="600" value="150"><input type="text" id="sizeRangeValue">
+    <select id="pattern-select">
+        <option value="">--Choose a Pattern--</option>
+    </select>
     <br>
-    <input type="range" id="sizeOuter" min="16" max="80" value="22"><input type="text" id="sizeOuterValue">
+    <input type="range" id="sizeRange" min="100" max="600" value="150"><input type="number" id="sizeRangeValue">
+    <br>
+    <input type="range" id="sizeOuter" min="16" max="80" value="22"><input type="number" id="sizeOuterValue">
     <br>
     <textarea id="arcsValue"></textarea>
     <br>
@@ -25,8 +29,21 @@
     <canvas id="myCanvas" width="1200" height="1200"></canvas>
 
     <script type="module">
+        const patternSelect = document.getElementById('pattern-select');
+        const patternFiles = ['border_pearl'
+            , 'overlaping_gates'
+            , 'romboids'];  // Add more patterns as needed
 
-        import { generateShapes } from './generators/border_pearl.js';
+        // Populate the dropdown with pattern file names
+        patternFiles.forEach(file => {
+            const option = document.createElement('option');
+            option.value = file;
+            option.text = file;
+            patternSelect.appendChild(option);
+        });
+
+        var selectedPattern = 'romboids';
+
         const canvas = document.getElementById('myCanvas');
         const ctx = canvas.getContext('2d');
 
@@ -42,7 +59,15 @@
 
         function drawArcsFast(arcs) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
             arcs.forEach(arc => {
+                if (arc.type === 'arc') {
+                    drawArcs(arc);
+                }
+                else if (arc.type === 'quad') {
+                    drawQuad(arc);
+                }
+                /*
                 ctx.beginPath();
                 ctx.arc(
                     arc.x,                 // x-coordinate of the center
@@ -53,9 +78,41 @@
                 );
                 ctx.strokeStyle = arc.color || 'white';
                 ctx.lineWidth = arc.lineWidth || 2;
-                ctx.stroke();
+                ctx.stroke();*/
             });
         }
+
+        function drawArcs(arc) {
+            ctx.beginPath();
+            ctx.arc(
+                arc.x,                 // x-coordinate of the center
+                arc.y,                 // y-coordinate of the center
+                arc.radius,                 // radius of the arc
+                arc.startAngle,             // start angle in radians
+                arc.endAngle
+            );
+            ctx.strokeStyle = arc.color || 'white';
+            ctx.lineWidth = arc.lineWidth || 2;
+            ctx.stroke();
+        }
+
+        function drawQuad(quad) {
+            ctx.beginPath();
+            ctx.moveTo(quad.a.x, quad.a.y);  // Start at the top quad.
+            ctx.lineTo(quad.b.x, quad.b.y);  // Draw line to the right quad.
+            ctx.lineTo(quad.c.x, quad.c.y);  // Draw line to the bottom quad.
+            ctx.lineTo(quad.d.x, quad.d.y);  // Draw line to the left point
+            ctx.closePath();  // Close the path (back to the top point)
+            ctx.strokeStyle = quad.color || 'white';
+            ctx.lineWidth = quad.lineWidth || 2;
+            ctx.stroke();
+        }
+
+        patternSelect.addEventListener('change', async () => {
+            selectedPattern = patternSelect.value;
+            redraw();
+
+        });
 
         sizeRange.addEventListener('input', function () {
             sizeRangeValue.value = sizeRange.value;
@@ -72,27 +129,34 @@
             redraw();
         })
 
-        const redraw = () => {
-            const arcs = generateShapes(300, 300, sizeRange.value, sizeOuter.value);
-            arcsValue.value = arcs.map(obj => JSON.stringify(obj, null, 2)).join('\n,\n');
-            drawArcsFast(arcs);
+        const redraw = async () => {
+            const { generateShapes } = await import(`./generators/${selectedPattern}.js`);
+
+            const { arcs } = await import(`./patterns/composite.1.js`);
+
+            const generated = generateShapes(300, 300, sizeRange.value, sizeOuter.value);
+            arcsValue.value = generated.map(obj => JSON.stringify(obj, null, 2)).join('\n,\n');
+
+            const toDraw = [...arcs, ...generated];
+
+            drawArcsFast(toDraw);
         }
 
         sizeRangeValue.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter') {
+            if (event.key === 'Enter'|| event.key === 'ArrowDown'|| event.key === 'ArrowUp') {
                 sizeRange.value = sizeRangeValue.value;
                 redraw();
             }
         })
 
         sizeOuterValue.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter') {
+            if (event.key === 'Enter'|| event.key === 'ArrowDown'|| event.key === 'ArrowUp') {
                 sizeOuter.value = sizeOuterValue.value;
                 redraw();
             }
         })
 
-        copyBtn.addEventListener('click', function(event){
+        copyBtn.addEventListener('click', function (event) {
             navigator.clipboard.writeText(arcsValue.value);
         })
 

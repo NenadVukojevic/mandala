@@ -11,23 +11,29 @@
 function generateShapes(centerX, centerY, outer, size) {
     const shapesArray = [];
 
-    shapesArray.push({type:'arc', x: centerX, y: centerY, radius: outer, startAngle: deg2rad(0), endAngle: deg2rad(365) },);
-    shapesArray.push({type:'arc', x: centerX, y: centerY, radius: outer - 4, startAngle: deg2rad(0), endAngle: deg2rad(365) },);
+    shapesArray.push({ type: 'arc', x: centerX, y: centerY, radius: outer, startAngle: deg2rad(0), endAngle: deg2rad(365) },);
+    shapesArray.push({ type: 'arc', x: centerX, y: centerY, radius: outer - size, startAngle: deg2rad(0), endAngle: deg2rad(365) },);
 
-    shapesArray.push({type:'arc', x: centerX, y: centerY, radius: outer - size + 4, startAngle: deg2rad(0), endAngle: deg2rad(365) },);
-    shapesArray.push({type:'arc', x: centerX, y: centerY, radius: outer - size, startAngle: deg2rad(0), endAngle: deg2rad(365) },);
-
+    var aRadius = outer - size;
     var bRadius = Math.round(outer - size / 2);
-    var pearlSize = Math.round((size - 14) / 2);
+
 
     var circumference = 2 * Math.PI * bRadius;
 
-    var pearlCount = Math.round(circumference / (2 * pearlSize))
+    var pearlCount = Math.round(circumference / (3 / 5 * size))
     var pearlAngle = 360 / pearlCount;
 
+    var rAngle = Math.atan((size / 2) / (outer - size / 2)) * 180 / Math.PI
+
+    console.log("rAngle", size / 2, outer - size / 2, rAngle);
+
     for (let i = 0; i < pearlCount; i++) {
-        const coordinate = getCoordinates(centerX, centerY, bRadius, i * pearlAngle);
-        shapesArray.push({type:'arc', x: coordinate.x, y: coordinate.y, radius: pearlSize, startAngle: deg2rad(0), endAngle: deg2rad(365) },);
+        const curAngle = i * pearlAngle;
+        const a = getCoordinates(centerX, centerY, aRadius + 1, curAngle);
+        const b = getCoordinates(centerX, centerY, bRadius, curAngle - rAngle)
+        const c = getCoordinates(centerX, centerY, outer - 1, curAngle);
+        const d = getCoordinates(centerX, centerY, bRadius, curAngle + rAngle)
+        shapesArray.push({ type: 'quad', a, b, c, d },);
     }
 
     return shapesArray;
