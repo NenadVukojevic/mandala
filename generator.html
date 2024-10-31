@@ -32,7 +32,10 @@
         const patternSelect = document.getElementById('pattern-select');
         const patternFiles = ['border_pearl'
             , 'overlaping_gates'
-            , 'romboids'];  // Add more patterns as needed
+            , 'romboids'
+            , 'gates'
+            , 'diamond'
+        ];  // Add more patterns as needed
 
         // Populate the dropdown with pattern file names
         patternFiles.forEach(file => {
@@ -66,6 +69,10 @@
                 }
                 else if (arc.type === 'quad') {
                     drawQuad(arc);
+                }
+                else if (arc.type === 'line')
+                {
+                    drawLine(arc.start, arc.end);
                 }
                 /*
                 ctx.beginPath();
@@ -108,6 +115,15 @@
             ctx.stroke();
         }
 
+        function drawLine(start, end) {
+            ctx.beginPath(); // Start a new path
+            ctx.moveTo(start.x, start.y); // Move the pen to (30, 50)
+            ctx.lineTo(end.x, end.y); // Draw a line to (150, 100)
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+
         patternSelect.addEventListener('change', async () => {
             selectedPattern = patternSelect.value;
             redraw();
@@ -143,14 +159,14 @@
         }
 
         sizeRangeValue.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter'|| event.key === 'ArrowDown'|| event.key === 'ArrowUp') {
+            if (event.key === 'Enter' || event.key === 'ArrowDown' || event.key === 'ArrowUp') {
                 sizeRange.value = sizeRangeValue.value;
                 redraw();
             }
         })
 
         sizeOuterValue.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter'|| event.key === 'ArrowDown'|| event.key === 'ArrowUp') {
+            if (event.key === 'Enter' || event.key === 'ArrowDown' || event.key === 'ArrowUp') {
                 sizeOuter.value = sizeOuterValue.value;
                 redraw();
             }
