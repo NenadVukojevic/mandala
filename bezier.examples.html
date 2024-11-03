@@ -1,0 +1,53 @@
+<html>
+
+<body>
+    <canvas id="myCanvas" width="800" height="600" style="border:1px solid #ccc;"></canvas>
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Quadratic Bézier Curves
+        ctx.beginPath();
+        ctx.moveTo(50, 200);
+        ctx.quadraticCurveTo(150, 50, 250, 200);
+        ctx.strokeStyle = 'blue';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(300, 200);
+        ctx.quadraticCurveTo(350, 50, 400, 200);
+        ctx.quadraticCurveTo(450, 350, 500, 200);
+        ctx.strokeStyle = 'purple';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Cubic Bézier Curves
+        ctx.beginPath();
+        ctx.moveTo(50, 300);
+        ctx.bezierCurveTo(150, 100, 250, 500, 350, 300);
+        ctx.strokeStyle = 'green';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(400, 300);
+        ctx.bezierCurveTo(450, 100, 550, 500, 600, 300);
+        ctx.bezierCurveTo(650, 100, 750, 500, 800, 300);
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Combined Quadratic and Cubic Bézier Curve
+        ctx.beginPath();
+        ctx.moveTo(50, 100);
+        ctx.quadraticCurveTo(150, 0, 250, 100);
+        ctx.bezierCurveTo(300, 300, 400, -100, 450, 100);
+        ctx.strokeStyle = 'orange';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    </script>
+
+</body>
+
+</html>

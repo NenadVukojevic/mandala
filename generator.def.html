@@ -14,18 +14,77 @@
 </style>
 
 <body>
-    <select id="pattern-select">
-        <option value="">--Choose a Pattern--</option>
-    </select>
-    <br>
-    <input type="range" id="sizeRange" min="100" max="600" value="150"><input type="number" id="sizeRangeValue">
-    <br>
-    <input type="range" id="sizeOuter" min="16" max="80" value="22"><input type="number" id="sizeOuterValue">
-    <br>
-    <textarea id="arcsValue"></textarea>
-    <br>
-    <input id="copyBtn" type="button" value="copy">
-    <br>
+    <div style="display: flex; flex-direction: column;">
+        <div style="display:flex; flex-direction:  row;">
+            <div style="color: white; width: 100px;">
+                pattern
+            </div>
+            <div>
+
+                <select id="pattern-select">
+                    <option value="">--Choose a Pattern--</option>
+                </select>
+            </div>
+            <div>
+                <button id="outerIncrease">click me</button>
+            </div>
+
+        </div>
+        <div style="display:flex; flex-direction:  row;">
+            <div style="color: white; width: 100px;">
+                Outer:
+            </div>
+            <div>
+                <input type="range" id="sizeRange" min="100" max="600" value="150">
+            </div>
+            <div>
+                <input type="number" id="sizeRangeValue">
+            </div>
+        </div>
+        <div style="display:flex; flex-direction:  row;">
+            <div style="color: white; width: 100px;">
+                Size:
+            </div>
+            <div>
+                <input type="range" id="sizeOuter" min="16" max="80" value="22">
+            </div>
+            <div>
+                <input type="number" id="sizeOuterValue">
+            </div>
+        </div>
+        <div style="display:flex; flex-direction:  row;">
+            <div style="color: white; width: 100px;">
+                Param1:
+            </div>
+            <div>
+                <input type="range" width="400px" id="param1" min="-360" max="360" value="0">
+            </div>
+            <div>
+                <input type="number" id="param1Value">
+            </div>
+        </div>
+        <div style="display:flex; flex-direction:  row;">
+            <div style="color: white; width: 100px;">
+                Param2
+            </div>
+            <div>
+                <input type="range" id="param2" min="-360" max="360" value="60">
+
+            </div>
+            <div>
+                <input type="number" id="param2Value">
+            </div>
+        </div>
+        <div>
+            <div>
+                <textarea id="arcsValue"></textarea>
+            </div>
+            <div>
+                <input id="copyBtn" type="button" value="copy">
+            </div>
+        </div>
+    </div>
+
     <canvas id="myCanvas" width="1200" height="1200"></canvas>
 
     <script type="module">
@@ -37,6 +96,9 @@
             , 'diamond'
             , 'tilda'
             , 'arc.1'
+            , 'arc.2'
+            , 'arc.3'
+            , 'arc.4'
         ];  // Add more patterns as needed
 
         // Populate the dropdown with pattern file names
@@ -57,6 +119,7 @@
 
         const sizeOuter = document.getElementById('sizeOuter');
         const sizeOuterValue = document.getElementById('sizeOuterValue');
+        const outerIncrease = document.getElementById('outerIncrease');
 
         const arcsValue = document.getElementById('arcsValue');
 
@@ -74,6 +137,13 @@
                 }
                 else if (arc.type === 'line') {
                     drawLine(arc.start, arc.end);
+                }
+                else if (arc.type === 'point') {
+                    drawPoint(arc);
+                }
+                else if (arc.type === 'bezier')
+                {
+                    drawBezier(arc);
                 }
                 /*
                 ctx.beginPath();
@@ -125,21 +195,36 @@
             ctx.stroke();
         }
 
-        function drawBezier(arc){
+        function drawPoint(arc) {
             ctx.beginPath();
-            ctx.moveTo(start.x, start.y); // Start point
+            ctx.arc(arc.x, arc.y, 2, 0, 2 * Math.PI); // Red dot radius = 5
+            ctx.fillStyle = arc.color || 'red';
+            ctx.fill();
+        }
 
+        function drawBezier(arc) {
+            ctx.beginPath();
+            ctx.moveTo(arc.start.x, arc.start.y); // Start point
+
+
+            console.log("a", arc.pointA.x);
+            console.log("b", arc.pointB.x);
+            console.log("end", arc.end.x);
 
             // First curve
-            ctx.bezierCurveTo(pointA.x, pointA.y, pointB.x, pointB.y, end.x, end.y);
+            ctx.bezierCurveTo(arc.pointA.x, arc.pointA.y, arc.pointB.x, arc.pointB.y, arc.end.x, arc.end.y);
 
             ctx.closePath();
 
             // Set fill color and fill the shape
-            ctx.fillStyle = "lightblue";
+            ctx.fillStyle = arc.background || 'black';
             ctx.fill();
-
+            ctx.strokeStyle = arc.color || 'white';
             ctx.stroke();
+        }
+
+        function increaseOuter() {
+            sizeOuter.value += 1
         }
 
         patternSelect.addEventListener('change', async () => {
@@ -163,20 +248,37 @@
             redraw();
         })
 
+        param1.addEventListener('input', function () {
+            param1Value.value = param1.value;
+            redraw();
+        })
+
+        param2.addEventListener('input', function () {
+            param2Value.value = param2.value;
+            redraw();
+        })
+
+
+        outerIncrease.addEventListener('click', function () {
+            console.log("outerIncrease clicked: ", sizeOuter.value);
+            sizeRange.value = sizeRange.value + 1;
+            redraw();
+        })
+
         const redraw = async () => {
             const { generateShapes } = await import(`./generators/${selectedPattern}.js`);
-            /*
+            
                         const { arcs } = await import(`./patterns/composite.1.js`);
             
-                        */
-            const generated = generateShapes(300, 300, sizeRange.value, sizeOuter.value);
+                       /* */
+            const generated = generateShapes(300, 300, sizeRange.value, sizeOuter.value, param1Value.value, param2Value.value);
             arcsValue.value = generated.map(obj => JSON.stringify(obj, null, 2)).join('\n,\n');
 
 
-       //     const toDraw = [...arcs, ...generated];
-       //     drawArcsFast(toDraw);
-            drawArcsFast(generated)
-            
+                 const toDraw = [...arcs, ...generated];
+               drawArcsFast(toDraw);
+            // // drawArcsFast(generated)
+
         }
 
         sizeRangeValue.addEventListener('keydown', function (event) {
