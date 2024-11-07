@@ -1,0 +1,209 @@
+<html>
+
+<head>
+    <style>
+        body {
+            background-color: black;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: 15px;
+            color: silver;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            padding: 5px;
+            gap: 10px
+        }
+
+        .mandala {
+            margin-top: 20px;
+            border: 1px solid silver;
+        }
+
+        .control {
+            display: flex;
+            flex-direction: row;
+            font-weight: bold;
+        }
+
+        .label {
+            width: 100px;
+        }
+
+        input[type='range'] {
+            width: 400px;
+        }
+
+        .elements {
+            display: flex;
+            flex-direction: row;
+            padding: 10px;
+            gap: 10px;
+        }
+
+        .element {
+            background-color: silver;
+            color: black;
+            width: 60px;
+            height: 40px;
+            text-align: center;
+            justify-items: center;
+            border-radius: 5px;
+            border-bottom: 2px solid white;
+            border-right: 2px solid white;
+            text-shadow: 1px 1px 1px white;
+        }
+
+        .element.selected {
+            background-color: gray;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        const center = {x:300, y:300};
+
+        const patternFiles = ['border_pearl'
+            , 'overlaping_gates'
+            , 'romboids'
+            , 'gates'
+            , 'diamond'
+            , 'tilda'
+            , 'arc.1'
+            , 'arc.2'
+            , 'arc.3'
+            , 'arc.4'
+        ];  // A
+
+        var selected = -1;
+
+        const addElement = async () => {
+            const maxId = elements.reduce((max, obj) => obj.id > max ? obj.id : max, 0);
+            const element = await updateElement(maxId + 1);
+
+            selected = element.id;
+            elements.push(element);
+
+        }
+
+        const updateElement = async (id) => {
+            const radius = document.getElementById('radius').value;
+            const size = document.getElementById('size').value;
+            const pattern = document.getElementById('pattern-select').value;
+            const { generateShapes } = await import(`./generators/${pattern}.js`);
+            const generated = await generateShapes(center.x, center.y, radius, size, 0, 0);
+            
+            const element = { id: id, radius: radius, size: size, pattern:pattern, arcs:generated };
+            return element;
+        }
+
+
+        const redraw  = async ()=>
+        {
+            console.log('called redraw');
+            elements.forEach(item=>{
+                console.log(item.id,  item.arcs)
+            });
+            
+        }
+
+        const elements = new Proxy([], {
+            set(target, property, value, receiver) {
+                const result = Reflect.set(target, property, value, receiver);
+
+                // Only react to actual array item changes, not length property or internal properties
+                if (property !== 'length') {
+                    showElements();
+                    redraw();
+                }
+
+                console.log(elements);
+                return result;
+            }
+        });
+
+        const showElements = () => {
+
+            const container = document.getElementById('elements');
+
+            container.innerHTML = '<div class="element" onclick="addElement()"><p>+</p></div>';
+
+            // Iterate over the array and create <li> for each item
+            elements.forEach(item => {
+                const li = document.createElement('div');
+                li.onclick = function () { selected = item.id; showElements() }
+                const p = document.createElement('p');
+                p.textContent = item.id;
+                li.append(p);
+                li.className = selected === item.id ? "element selected" : "element";
+                container.appendChild(li);
+            });
+
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            showElements();
+
+            const patternSelect = document.getElementById('pattern-select');
+            patternFiles.forEach(file => {
+                const option = document.createElement('option');
+                option.value = file;
+                option.text = file;
+                patternSelect.appendChild(option);
+            });
+        });
+    </script>
+    <div class="container">
+        <div class="nav">
+            <div class="control">
+                <div class="label">
+                    pattern
+                </div>
+                <div>
+                    <select id="pattern-select">
+                        <option value="">--Choose a Pattern--</option>
+                    </select>
+                </div>
+                <div></div>
+            </div>
+            <div class="control">
+                <div class="label">radius</div>
+                <div>
+                    <input id="radius" type="range" value="24" min="10" max="600"
+                        oninput="this.nextElementSibling.value = this.value">
+                    <output>24</output>
+                </div>
+                <div></div>
+            </div>
+            <div class="control">
+                <div class="label">size</div>
+                <div><input id="size" type="range" value="10" min="1" max="60"
+                        oninput="this.nextElementSibling.value = this.value">
+                    <output>10</output>
+                </div>
+                <div></div>
+            </div>
+        </div>
+        <div id="elements" class="elements">
+
+            <div class="element" onclick="addElement()">
+                <p>+</p>
+            </div>
+        </div>
+    </div>
+    <div class="mandala">
+        <canvas id="myCanvas" width="1200" height="1200"></canvas>
+    </div>
+
+</body>
+
+</html>
