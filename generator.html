@@ -37,6 +37,10 @@
             , 'diamond'
             , 'tilda'
             , 'arc.1'
+            , 'arc.2'
+            , 'arc.3'
+            , 'arc.4'
+            , 'celtic'
         ];  // Add more patterns as needed
 
         // Populate the dropdown with pattern file names
@@ -74,6 +78,13 @@
                 }
                 else if (arc.type === 'line') {
                     drawLine(arc.start, arc.end);
+                }
+                else if (arc.type === 'point') {
+                    drawPoint(arc);
+                }
+                else if (arc.type === 'bezier')
+                {
+                    drawBezier(arc);
                 }
                 /*
                 ctx.beginPath();
@@ -125,22 +136,43 @@
             ctx.stroke();
         }
 
-        function drawBezier(arc){
+        function drawPoint(arc) {
             ctx.beginPath();
-            ctx.moveTo(start.x, start.y); // Start point
+            ctx.arc(arc.x, arc.y, 2, 0, 2 * Math.PI); // Red dot radius = 5
+            ctx.fillStyle = arc.color || 'red';
 
+
+
+
+
+
+
+
+            ctx.fill();
+        }
+
+        function drawBezier(arc) {
+            ctx.beginPath();
+            ctx.moveTo(arc.start.x, arc.start.y); // Start point
+
+
+            console.log("a", arc.pointA.x);
+            console.log("b", arc.pointB.x);
+            console.log("end", arc.end.x);
 
             // First curve
-            ctx.bezierCurveTo(pointA.x, pointA.y, pointB.x, pointB.y, end.x, end.y);
+            ctx.bezierCurveTo(arc.pointA.x, arc.pointA.y, arc.pointB.x, arc.pointB.y, arc.end.x, arc.end.y);
 
             ctx.closePath();
 
             // Set fill color and fill the shape
-            ctx.fillStyle = "lightblue";
+            ctx.fillStyle = arc.background || 'black';
             ctx.fill();
-
+            ctx.strokeStyle = arc.color || 'white';
             ctx.stroke();
         }
+
+
 
         patternSelect.addEventListener('change', async () => {
             selectedPattern = patternSelect.value;

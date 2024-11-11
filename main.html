@@ -68,100 +68,6 @@
 </head>
 
 <body>
-    <script>
-        const center = {x:300, y:300};
-
-        const patternFiles = ['border_pearl'
-            , 'overlaping_gates'
-            , 'romboids'
-            , 'gates'
-            , 'diamond'
-            , 'tilda'
-            , 'arc.1'
-            , 'arc.2'
-            , 'arc.3'
-            , 'arc.4'
-        ];  // A
-
-        var selected = -1;
-
-        const addElement = async () => {
-            const maxId = elements.reduce((max, obj) => obj.id > max ? obj.id : max, 0);
-            const element = await updateElement(maxId + 1);
-
-            selected = element.id;
-            elements.push(element);
-
-        }
-
-        const updateElement = async (id) => {
-            const radius = document.getElementById('radius').value;
-            const size = document.getElementById('size').value;
-            const pattern = document.getElementById('pattern-select').value;
-            const { generateShapes } = await import(`./generators/${pattern}.js`);
-            const generated = await generateShapes(center.x, center.y, radius, size, 0, 0);
-            
-            const element = { id: id, radius: radius, size: size, pattern:pattern, arcs:generated };
-            return element;
-        }
-
-
-        const redraw  = async ()=>
-        {
-            console.log('called redraw');
-            elements.forEach(item=>{
-                console.log(item.id,  item.arcs)
-            });
-            
-        }
-
-        const elements = new Proxy([], {
-            set(target, property, value, receiver) {
-                const result = Reflect.set(target, property, value, receiver);
-
-                // Only react to actual array item changes, not length property or internal properties
-                if (property !== 'length') {
-                    showElements();
-                    redraw();
-                }
-
-                console.log(elements);
-                return result;
-            }
-        });
-
-        const showElements = () => {
-
-            const container = document.getElementById('elements');
-
-            container.innerHTML = '<div class="element" onclick="addElement()"><p>+</p></div>';
-
-            // Iterate over the array and create <li> for each item
-            elements.forEach(item => {
-                const li = document.createElement('div');
-                li.onclick = function () { selected = item.id; showElements() }
-                const p = document.createElement('p');
-                p.textContent = item.id;
-                li.append(p);
-                li.className = selected === item.id ? "element selected" : "element";
-                container.appendChild(li);
-            });
-
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-
-            showElements();
-
-            const patternSelect = document.getElementById('pattern-select');
-            patternFiles.forEach(file => {
-                const option = document.createElement('option');
-                option.value = file;
-                option.text = file;
-                patternSelect.appendChild(option);
-            });
-        });
-    </script>
     <div class="container">
         <div class="nav">
             <div class="control">
@@ -203,6 +109,265 @@
     <div class="mandala">
         <canvas id="myCanvas" width="1200" height="1200"></canvas>
     </div>
+
+    <script>
+        const center = { x: 300, y: 300 };
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+        const patternFiles = ['border_pearl'
+            , 'overlaping_gates'
+            , 'romboids'
+            , 'gates'
+            , 'diamond'
+            , 'tilda'
+            , 'arc.1'
+            , 'arc.2'
+            , 'arc.3'
+            , 'arc.4'
+        ];  // A
+
+        var selected = -1;
+        var curColor = 'white';
+        const patternSelect = document.getElementById('pattern-select');
+        const radiusControl = document.getElementById('radius');
+        const sizeControl = document.getElementById('size');
+        let isUpdatingProgrammaticaly = false;
+
+
+        const addElement = async () => {
+            const maxId = elements.reduce((max, obj) => obj.id > max ? obj.id : max, 0);
+            const element = await updateElement(maxId + 1);
+
+            selected = element.id;
+            elements.push(element);
+
+        }
+
+        const updateElement = async (id) => {
+            const radius = document.getElementById('radius').value;
+            const size = document.getElementById('size').value;
+            const pattern = document.getElementById('pattern-select').value;
+            console.log('update element: ', id, radius, size, pattern);
+            const element = { id: id, radius: radius, size: size, pattern: pattern, arcs: [] };
+            if (pattern === '') {
+                return element;
+            }
+            const { generateShapes } = await import(`./generators/${pattern}.js`);
+            const generated = await generateShapes(center.x, center.y, radius, size, 0, 0);
+            element.arcs = generated;
+            return element;
+        }
+
+        function upsertObjectById(array, newObject) {
+            const index = array.findIndex(obj => obj.id === newObject.id);
+            console.log("upsertObjectById: ", newObject.id, array.length, newObject);
+
+            if (index !== -1) {
+                // Replace existing object with newObject
+                array[index] = newObject;
+            } else {
+                // Add newObject to the array
+                array.push(newObject);
+            }
+
+            return array;
+        }
+
+        function drawArcsFast(arcs) {
+            //ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            arcs.forEach(arc => {
+                if (arc.type === 'arc') {
+                    drawArcs(arc);
+                }
+                else if (arc.type === 'quad') {
+                    drawQuad(arc);
+                }
+                else if (arc.type === 'line') {
+                    drawLine(arc.start, arc.end);
+                }
+                else if (arc.type === 'point') {
+                    drawPoint(arc);
+                }
+                else if (arc.type === 'bezier') {
+                    drawBezier(arc);
+                }
+                /*
+                ctx.beginPath();
+                ctx.arc(
+                    arc.x,                 // x-coordinate of the center
+                    arc.y,                 // y-coordinate of the center
+                    arc.radius,                 // radius of the arc
+                    arc.startAngle,             // start angle in radians
+                    arc.endAngle
+                );
+                ctx.strokeStyle = arc.color || 'white';
+                ctx.lineWidth = arc.lineWidth || 2;
+                ctx.stroke();*/
+            });
+        }
+
+        function drawArcs(arc) {
+            ctx.beginPath();
+            ctx.arc(
+                arc.x,                 // x-coordinate of the center
+                arc.y,                 // y-coordinate of the center
+                arc.radius,                 // radius of the arc
+                arc.startAngle,             // start angle in radians
+                arc.endAngle
+            );
+            ctx.strokeStyle = arc.color || curColor;
+            ctx.lineWidth = arc.lineWidth || 2;
+            ctx.stroke();
+        }
+
+        function drawQuad(quad) {
+            ctx.beginPath();
+            ctx.moveTo(quad.a.x, quad.a.y);  // Start at the top quad.
+            ctx.lineTo(quad.b.x, quad.b.y);  // Draw line to the right quad.
+            ctx.lineTo(quad.c.x, quad.c.y);  // Draw line to the bottom quad.
+            ctx.lineTo(quad.d.x, quad.d.y);  // Draw line to the left point
+            ctx.closePath();  // Close the path (back to the top point)
+            ctx.strokeStyle = quad.color || curColor;
+            ctx.lineWidth = quad.lineWidth || 2;
+            ctx.stroke();
+        }
+
+        function drawLine(start, end) {
+            ctx.beginPath(); // Start a new path
+            ctx.moveTo(start.x, start.y); // Move the pen to (30, 50)
+            ctx.lineTo(end.x, end.y); // Draw a line to (150, 100)
+            ctx.strokeStyle = curColor;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+
+        function drawPoint(arc) {
+            ctx.beginPath();
+            ctx.arc(arc.x, arc.y, 2, 0, 2 * Math.PI); // Red dot radius = 5
+            ctx.fillStyle = arc.color || 'red';
+            ctx.fill();
+        }
+
+        function drawBezier(arc) {
+            ctx.beginPath();
+            ctx.moveTo(arc.start.x, arc.start.y); // Start point
+
+
+            console.log("a", arc.pointA.x);
+            console.log("b", arc.pointB.x);
+            console.log("end", arc.end.x);
+
+            // First curve
+            ctx.bezierCurveTo(arc.pointA.x, arc.pointA.y, arc.pointB.x, arc.pointB.y, arc.end.x, arc.end.y);
+
+            ctx.closePath();
+
+            // Set fill color and fill the shape
+            ctx.fillStyle = arc.background || 'black';
+            ctx.fill();
+            ctx.strokeStyle = arc.color || curColor;
+            ctx.stroke();
+        }
+
+
+        const redraw = async () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            elements.forEach(item => {
+
+                if (item.id === selected) {
+                    curColor = 'silver';
+                }
+                else {
+                    curColor = 'white';
+                }
+
+                if (item.arcs?.length > 0) {
+                    drawArcsFast(item.arcs)
+                }
+            });
+
+        }
+
+        const elements = new Proxy([], {
+            set(target, property, value, receiver) {
+                const result = Reflect.set(target, property, value, receiver);
+
+                // Only react to actual array item changes, not length property or internal properties
+                if (property !== 'length') {
+                    showElements();
+                    redraw();
+                }
+
+                console.log(elements);
+                return result;
+            }
+        });
+
+        const showElements = () => {
+
+            const container = document.getElementById('elements');
+           // container.onclick = function () { setSelected({ id: -2 }) };
+            container.innerHTML = '<div class="element" onclick="addElement()"><p>+</p></div>';
+
+            // Iterate over the array and create <li> for each item
+            elements.forEach(item => {
+                const li = document.createElement('div');
+                li.onclick = function () { setSelected(item); };
+                const p = document.createElement('p');
+                p.textContent = item.id;
+                li.append(p);
+                li.className = selected === item.id ? "element selected" : "element";
+                container.appendChild(li);
+            });
+
+        }
+        const setSelected = (item) => {
+            
+            selected = item.id;
+            isUpdatingProgrammaticaly = true;
+            radiusControl.value = item.radius;
+            sizeControl.value = item.size;
+            patternSelect.value = item.pattern;
+            isUpdatingProgrammaticaly = false;
+            showElements();
+            redraw();
+        }
+
+
+        showElements();
+
+
+        patternFiles.forEach(file => {
+            const option = document.createElement('option');
+            option.value = file;
+            option.text = file;
+            patternSelect.appendChild(option);
+        });
+
+        radiusControl.addEventListener('input', async function () {
+            if (isUpdatingProgrammaticaly) return;
+            const newElement = await updateElement(selected);
+            upsertObjectById(elements, newElement);
+            redraw();
+        });
+
+        sizeControl.addEventListener('input', async function () {
+            if (isUpdatingProgrammaticaly) return;
+            const newElement = await updateElement(selected);
+            upsertObjectById(elements, newElement);
+            redraw();
+        });
+
+        patternSelect.addEventListener('input', async function () {
+            if (isUpdatingProgrammaticaly) return;
+            const newElement = await updateElement(selected);
+            upsertObjectById(elements, newElement);
+            redraw();
+        });
+
+    </script>
+
 
 </body>
 

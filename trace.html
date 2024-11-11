@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canvas Tracing Example</title>
+<style>
+    /* Container for positioning image and canvas */
+    .canvas-container {
+        position: relative;
+        width: 600px; /* Set desired width */
+        height: 400px; /* Set desired height */
+    }
+    /* Background image styling */
+    .background-image {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 1; /* Make sure image is beneath the canvas */
+        opacity: 0.5; /* Optional: Set image transparency */
+    }
+    /* Transparent canvas overlay */
+    canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 2;
+    }
+</style>
+</head>
+<body>
+
+<div class="canvas-container">
+    <!-- Background image for tracing -->
+    <img src="pattern.celtic.jpg" alt="Background" class="background-image">
+    
+    <!-- Transparent canvas overlay -->
+    <canvas id="drawingCanvas" width="600" height="400"></canvas>
+</div>
+
+<script>
+// Get the canvas and context
+const canvas = document.getElementById('drawingCanvas');
+const ctx = canvas.getContext('2d');
+
+// Variables for drawing
+let isDrawing = false;
+let startX = 0;
+let startY = 0;
+let ctrlX = 0;
+let ctrlY = 0;
+
+// Function to start drawing
+canvas.addEventListener('mousedown', (e) => {
+    isDrawing = true;
+    startX = e.offsetX;
+    startY = e.offsetY;
+});
+
+// Function to set control point for bezier curve
+canvas.addEventListener('mousemove', (e) => {
+    if (!isDrawing) return;
+
+    // Capture the control point dynamically
+    ctrlX = e.offsetX;
+    ctrlY = e.offsetY;
+    
+    // Clear canvas to redraw (transparent)
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw Bezier curve with current control points
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.quadraticCurveTo(ctrlX, ctrlY, e.offsetX, e.offsetY);
+    ctx.strokeStyle = 'red';  // Set color for tracing lines
+    ctx.lineWidth = 2;
+    ctx.stroke();
+});
+
+// Function to end drawing
+canvas.addEventListener('mouseup', () => {
+    isDrawing = false;
+    // Optional: Leave the last curve on the canvas by not clearing
+});
+</script>
+
+</body>
+</html>

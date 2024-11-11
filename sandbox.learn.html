@@ -8,10 +8,33 @@
         background-color: white;
     }
 
+    .canvas-container {
+        position: relative;
+        width: 600px;
+        /* Set desired width */
+        height: 400px;
+        /* Set desired height */
+    }
+
+    /* Background image styling */
+    .background-image {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        /* Make sure image is beneath the canvas */
+        opacity: 0.5;
+        /* Optional: Set image transparency */
+    }
+
+    /* Transparent canvas overlay */
     canvas {
-        display: block;
-        margin: 20px;
-        border: 1px solid black;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 2;
     }
 </style>
 
@@ -54,7 +77,10 @@
         <div>
             <button id="showResult">show</button>
         </div>
-        <div>
+        <div class="canvas-container">
+            <!-- Background image for tracing -->
+            <img src="pattern.celtic.jpg" alt="Background" class="background-image">
+
             <canvas id="myCanvas" width="1200" height="1200"></canvas>
         </div>
     </div>
@@ -130,9 +156,16 @@
             console.log('start', start, 'end', end, 'pointA', pointA, 'pointB', pointB);
         })
 
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            startX = e.offsetX;
+            startY = e.offsetY;
+            console.log(startX, startY);
+        });
+
         var deltaR = 5;
-        var start = { x: 250, y: 400 };
-        var end = { x: 300, y: 400 };
+        var start = { x: 344, y: 178 };
+        var end = { x: 442, y: 60 };
         var pointA = { x: 150, y: 200 };
         var pointB = { x: 400, y: 200 };
 
@@ -160,11 +193,11 @@
             context.closePath();
 
             // Set fill color and fill the shape
-            context.fillStyle = "lightblue";
+            context.fillStyle = 'rgba(125, 0, 0, 0.2)';
             context.fill();
 
             context.stroke();
-            context.fill
+
         }
     </script>
 </body>
