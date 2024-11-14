@@ -27,16 +27,16 @@ function generateShapes(centerX, centerY, outer, size, param1, param2) {
     for (let i = 0; i < pearlCount; i++)
     //const i = 0
     {
-        const start = getCoordinates(centerX, centerY, bRadius, i * pearlAngle - pearlAngle / 2);
-        const end = getCoordinates(centerX, centerY, bRadius, i * pearlAngle + pearlAngle / 2)
-        const pointA = getCoordinates(centerX, centerY, outer, i * pearlAngle + pearlAngle / 16);
-        const pointB = getCoordinates(centerX, centerY, outer, i * pearlAngle - pearlAngle / 16);
-        
-        shapesArray.push({ type: 'bezier', start:start, end:end, pointA:pointA, pointB:pointB, background: 'black', color: 'white' });
+        const start = getCoordinates(centerX, centerY, bRadius + 7 / 8 * size, i * pearlAngle - pearlAngle / 2);
+        const end = getCoordinates(centerX, centerY, bRadius + 1 / 8 * size, i * pearlAngle + pearlAngle / 2)
+        const pointA = getCoordinates(centerX, centerY, bRadius + 6 / 7 * size, i * pearlAngle + pearlAngle / 3);
+        const pointB = getCoordinates(centerX, centerY, bRadius + 1 / 5 * size, i * pearlAngle - pearlAngle / 8);
 
-        
-        
-        
+        shapesArray.push({ type: 'bezier', start: start, end: end, pointA: pointA, pointB: pointB, background: 'black', color: 'white' });
+
+
+
+
 
     }
 

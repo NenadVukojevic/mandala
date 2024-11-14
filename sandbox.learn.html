@@ -12,7 +12,7 @@
         position: relative;
         width: 600px;
         /* Set desired width */
-        height: 400px;
+        height: 600px;
         /* Set desired height */
     }
 
@@ -79,7 +79,7 @@
         </div>
         <div class="canvas-container">
             <!-- Background image for tracing -->
-            <img src="pattern.celtic.jpg" alt="Background" class="background-image">
+            <img src="rope.png" alt="Background" class="background-image" style="transform: rotate(360deg)">
 
             <canvas id="myCanvas" width="1200" height="1200"></canvas>
         </div>
@@ -162,24 +162,16 @@
             startY = e.offsetY;
             console.log(startX, startY);
         });
-
-        var deltaR = 5;
-        var start = { x: 344, y: 178 };
-        var end = { x: 442, y: 60 };
-        var pointA = { x: 150, y: 200 };
-        var pointB = { x: 400, y: 200 };
-
-        function redraw() {
-            context.clearRect(0, 0, canvas.width, canvas.height);
+        const drawBesier = (defColor) => {
 
             context.beginPath();
             context.arc(pointA.x, pointA.y, 2, 0, 2 * Math.PI); // Red dot radius = 5
-            context.fillStyle = 'red';
+            context.fillStyle = defColor;
             context.fill();
 
             context.beginPath();
             context.arc(pointB.x, pointB.y, 2, 0, 2 * Math.PI); // Red dot radius = 5
-            context.fillStyle = 'red';
+            context.fillStyle = defColor;
             context.fill();
 
 
@@ -197,8 +189,32 @@
             context.fill();
 
             context.stroke();
+        }
+        
+        var deltaR = 5;
+        {
+            var start = { x: 430, y: 215 };
+            var end = { x: 320, y: 360 };
+            var pointA = { x: 150, y: 200 };
+            var pointB = { x: 400, y: 200 };
+            drawBesier('blue');
+        }
+
+        var start = { x: 320, y: 360 };
+        var end = { x: 430, y: 215 };
+        var pointA = { x: 285, y: 230 };
+        var pointB = { x: 420, y: 270 };
+
+        function redraw() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+
+
+            drawBesier('red');
 
         }
+
+
     </script>
 </body>
 
