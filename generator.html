@@ -82,9 +82,11 @@
                 else if (arc.type === 'point') {
                     drawPoint(arc);
                 }
-                else if (arc.type === 'bezier')
-                {
+                else if (arc.type === 'bezier') {
                     drawBezier(arc);
+                }
+                else if (arc.type === 'bezierArray') {
+                    drawBezierArray(arc);
                 }
                 /*
                 ctx.beginPath();
@@ -172,6 +174,22 @@
             ctx.stroke();
         }
 
+        function drawBezierArray(arc) {
+            ctx.beginPath();
+            arc.elements.forEach((arc) => {
+
+                ctx.moveTo(arc.start.x, arc.start.y); // Start point
+                ctx.bezierCurveTo(arc.pointA.x, arc.pointA.y, arc.pointB.x, arc.pointB.y, arc.end.x, arc.end.y);
+
+            })
+            //ctx.closePath();
+
+            // Set fill color and fill the shape
+            ctx.fillStyle = arc.background || 'red';
+            ctx.fill();
+            ctx.strokeStyle = arc.color || 'white';
+            ctx.stroke();
+        }
 
 
         patternSelect.addEventListener('change', async () => {
@@ -205,10 +223,10 @@
             arcsValue.value = generated.map(obj => JSON.stringify(obj, null, 2)).join('\n,\n');
 
 
-       //     const toDraw = [...arcs, ...generated];
-       //     drawArcsFast(toDraw);
+            //     const toDraw = [...arcs, ...generated];
+            //     drawArcsFast(toDraw);
             drawArcsFast(generated)
-            
+
         }
 
         sizeRangeValue.addEventListener('keydown', function (event) {
